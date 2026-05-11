@@ -1,39 +1,28 @@
-import { useEffect, useState } from "react";
-import { sendMove, testBackend } from "./services/api";
+import { useState } from 'react';
+import Login from './components/Login';
+import Game from './components/Game';
 
-function App() {
-  const [status, setStatus] = useState("loading...");
-  const [playerY, setPlayerY] = useState(4);
+export default function App() {
+  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [username, setUsername] = useState(() => localStorage.getItem('username'));
 
-  useEffect(() => {
-    testBackend()
-      .then((data) => setStatus(data.status))
-      .catch(() => setStatus("backend offline"));
-  }, []);
-
-  const moveForward = async () => {
-    await sendMove("forward");
-    setPlayerY((y) => Math.max(0, y - 1));
+  const handleLogin = (t, u) => {
+    localStorage.setItem('token', t);
+    localStorage.setItem('username', u);
+    setToken(t);
+    setUsername(u);
   };
 
-  return (
-    <main style={{ padding: 30 }}>
-      <h1>IoT Crossy Road</h1>
-      <p>Backend status : {status}</p>
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    setToken(null);
+    setUsername(null);
+  };
 
-      <div style={{ fontSize: 32, lineHeight: "42px" }}>
-        {[0, 1, 2, 3, 4].map((row) => (
-          <div key={row}>
-            {row === playerY ? "🐸 ⬛ ⬛ ⬛ ⬛" : "⬛ ⬛ ⬛ ⬛ ⬛"}
-          </div>
-        ))}
-      </div>
-
-      <button onClick={moveForward} style={{ marginTop: 20 }}>
-        Avancer
-      </button>
-    </main>
+  return token ? (
+    <Game token={token} username={username} onLogout={handleLogout} />
+  ) : (
+    <Login onLogin={handleLogin} />
   );
 }
-
-export default App;
