@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: ../backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MQTT_URL=mqtt://mosquitto:1883
+    depends_on:
+      - mosquitto
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  frontend:
+    build: ../frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+    depends_on:
+      - backend
