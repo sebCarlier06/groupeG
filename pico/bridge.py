@@ -75,10 +75,17 @@ def main():
             if not line:
                 continue
             print(f"Série reçu : {line!r}")
-            if line == 'press':
+            # 'press' = rétrocompatibilité (ancien firmware → up)
+            DIRECTIONS = {'up', 'down', 'left', 'right', 'press'}
+            if line in DIRECTIONS:
+                direction = 'up' if line == 'press' else line
                 try:
-                    r = requests.post(f"{BACKEND_HTTP}/api/game/button", timeout=2)
-                    print(f"Backend : {r.status_code}")
+                    r = requests.post(
+                        f"{BACKEND_HTTP}/api/game/button",
+                        json={'direction': direction},
+                        timeout=2,
+                    )
+                    print(f"Backend {direction}: {r.status_code}")
                 except requests.RequestException as e:
                     print(f"Erreur backend : {e}")
         except serial.SerialException as e:

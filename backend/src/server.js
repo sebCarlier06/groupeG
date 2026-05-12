@@ -62,13 +62,14 @@ io.on('connection', (socket) => {
  *         description: Événement transmis
  */
 app.post('/api/game/button', (req, res) => {
+  const direction = req.body?.direction || 'up';
   try {
     const db = require('./db');
-    db.prepare('INSERT INTO button_events (event_type) VALUES (?)').run('button_press');
+    db.prepare('INSERT INTO button_events (event_type) VALUES (?)').run(`btn_${direction}`);
   } catch (e) {
     console.error('Erreur DB:', e.message);
   }
-  io.emit('button_press', { timestamp: Date.now() });
+  io.emit('button_press', { direction, timestamp: Date.now() });
   res.json({ ok: true });
 });
 
