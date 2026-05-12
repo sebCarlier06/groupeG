@@ -36,10 +36,40 @@ app.get('/api/health', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('Client WebSocket connecté:', socket.id);
-  socket.on('game_over', () => sendCommand('ON'));
-  socket.on('game_win', () => sendCommand('WIN'));
-  socket.on('game_reset', () => sendCommand('OFF'));
+  socket.on('game_over', () => {
+    sendCommand('ON');
+    io.emit('led_command', { command: 'ON' });
+  });
+  socket.on('game_win', () => {
+    sendCommand('WIN');
+    io.emit('led_command', { command: 'WIN' });
+  });
+  socket.on('game_reset', () => {
+    sendCommand('OFF');
+    io.emit('led_command', { command: 'OFF' });
+  });
   socket.on('disconnect', () => console.log('Client déconnecté:', socket.id));
+});
+
+/**
+ * @swagger
+ * /api/game/button:
+ *   post:
+ *     summary: Simule un appui bouton physique (bridge USB→HTTP)
+ *     tags: [Game]
+ *     responses:
+ *       200:
+ *         description: Événement transmis
+ */
+app.post('/api/game/button', (req, res) => {
+  try {
+    const db = require('./db');
+    db.prepare('INSERT INTO button_events (event_type) VALUES (?)').run('button_press');
+  } catch (e) {
+    console.error('Erreur DB:', e.message);
+  }
+  io.emit('button_press', { timestamp: Date.now() });
+  res.json({ ok: true });
 });
 
 setSocketIo(io);
