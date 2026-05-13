@@ -30,3 +30,6 @@ npm-debug.log*
 
 # Fichiers temporaires
 *.local
+
+# Config Pico W (contient les credentials Wi-Fi)
+pico/config.py

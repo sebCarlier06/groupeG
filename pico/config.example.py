@@ -1,0 +1,5 @@
+WIFI_SSID     = "NomDuWifi"
+WIFI_PASSWORD = "MotDePasse"
+
+MQTT_HOST = "192.168.x.x"
+MQTT_PORT = 1883

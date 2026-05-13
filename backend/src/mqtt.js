@@ -19,13 +19,20 @@ client.on('message', (topic, message) => {
   console.log(`MQTT [${topic}]: ${payload}`);
 
   if (topic === 'game/button/press') {
+    let direction = 'up';
+    try {
+      const data = JSON.parse(payload);
+      direction = data.direction || 'up';
+    } catch {
+      direction = payload.trim() || 'up';
+    }
     try {
       const db = require('./db');
-      db.prepare('INSERT INTO button_events (event_type) VALUES (?)').run('button_press');
+      db.prepare('INSERT INTO button_events (event_type) VALUES (?)').run(`btn_${direction}`);
     } catch (e) {
       console.error('Erreur DB:', e.message);
     }
-    if (io) io.emit('button_press', { timestamp: Date.now() });
+    if (io) io.emit('button_press', { direction, timestamp: Date.now() });
   }
 });
 

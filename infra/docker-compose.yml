@@ -27,7 +27,7 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
     environment:
-      - VITE_API_URL=http://localhost:8080/api
+      - VITE_API_URL=http://10.0.60.10:8080/api
     depends_on:
       - backend
     restart: unless-stopped
